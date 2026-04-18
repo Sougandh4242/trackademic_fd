@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2, Search, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { authStore } from "@/lib/auth";
 import { aiApi } from "@/lib/services";
 import { GlassCard } from "@/components/glass-card";

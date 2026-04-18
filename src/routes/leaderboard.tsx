@@ -1,7 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Crown, Filter, Loader2, Search, Trophy } from "lucide-react";
+import { Crown, Filter, Search, Trophy } from "lucide-react";
+import { toast } from "sonner";
 import {
   BarChart,
   Bar,
