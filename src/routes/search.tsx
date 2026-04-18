@@ -44,6 +44,7 @@ function SearchPage() {
       const list: any[] = res?.results || res?.matches || res?.data || res || [];
       setResults(Array.isArray(list) ? list : []);
     } catch (e: any) {
+      toast.error("Search failed", { description: e?.message });
       setResults([]);
     } finally {
       setBusy(false);
