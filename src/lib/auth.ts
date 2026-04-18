@@ -37,6 +37,12 @@ export const authStore = {
       return null;
     }
   },
+  setToken(token: string) {
+    localStorage.setItem(TOKEN_KEY, token);
+  },
+  setUser(user: AuthUser) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  },
   set(token: string, user: AuthUser) {
     localStorage.setItem(TOKEN_KEY, token);
     localStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -49,21 +55,47 @@ export const authStore = {
   },
 };
 
+/**
+ * POST /login -> { token, role }
+ * After login we fetch /get-profile to populate the user object.
+ */
 export async function login(payload: {
   email: string;
   password: string;
 }): Promise<AuthResponse> {
   try {
     const { data } = await api.post("/login", payload);
-    // be liberal in what we accept
     const token: string =
       data?.token || data?.access_token || data?.jwt || "";
-    const user: AuthUser = data?.user ||
-      data?.profile || {
-        email: payload.email,
-        role: (data?.role as Role) || "student",
-      };
     if (!token) throw new Error("No token returned by /login");
+
+    const role: Role = (data?.role as Role) || "student";
+
+    // Persist token first so subsequent calls send Authorization
+    authStore.setToken(token);
+
+    // Try to load full profile; tolerate missing endpoint
+    let user: AuthUser = {
+      email: payload.email,
+      role,
+      ...(data?.user || {}),
+    };
+    try {
+      const { data: prof } = await api.get("/get-profile");
+      const p = prof?.profile || prof || {};
+      user = {
+        email: p.email || payload.email,
+        role: (p.role as Role) || role,
+        name: p.name,
+        usn: p.usn,
+        department: p.department,
+        avatarUrl: p.avatarUrl || p.avatar_url,
+        ...p,
+      };
+    } catch {
+      // ignore — keep minimal user
+    }
+
     authStore.set(token, user);
     return { token, user };
   } catch (e) {
@@ -71,6 +103,9 @@ export async function login(payload: {
   }
 }
 
+/**
+ * POST /register -> { token, user }
+ */
 export async function register(payload: {
   name: string;
   email: string;
@@ -83,7 +118,7 @@ export async function register(payload: {
     const { data } = await api.post("/register", payload);
     const token: string =
       data?.token || data?.access_token || data?.jwt || "";
-    const user: AuthUser = data?.user || {
+    const user: AuthUser = (data?.user as AuthUser) || {
       name: payload.name,
       email: payload.email,
       role: payload.role,

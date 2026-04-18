@@ -11,7 +11,8 @@ async function call<T>(fn: () => Promise<{ data: T }>): Promise<T> {
 
 export const profileApi = {
   get: () => call<any>(() => api.get("/get-profile")),
-  getFull: () => call<any>(() => api.get("/get-full-profile")),
+  // backend exposes /get-profile only; keep getFull as alias for callers
+  getFull: () => call<any>(() => api.get("/get-profile")),
   create: (payload: any) => call<any>(() => api.post("/create-profile", payload)),
   update: (payload: any) => call<any>(() => api.post("/update-profile", payload)),
   uploadImage: (file: File) => {
@@ -52,8 +53,12 @@ export const facultyApi = {
 };
 
 export const aiApi = {
+  // GET /semantic-search?q=
   semanticSearch: (query: string) =>
-    call<any>(() => api.post("/semantic-search", { query })),
-  chat: (message: string, history?: { role: string; content: string }[]) =>
-    call<any>(() => api.post("/chat", { message, history })),
+    call<any>(() =>
+      api.get("/semantic-search", { params: { q: query } }),
+    ),
+  // POST /chat  { message } -> { reply }
+  chat: (message: string) =>
+    call<any>(() => api.post("/chat", { message })),
 };

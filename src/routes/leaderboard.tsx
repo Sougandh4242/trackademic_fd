@@ -1,7 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Crown, Filter, Loader2, Search, Trophy } from "lucide-react";
+import { Crown, Filter, Search, Trophy } from "lucide-react";
+import { toast } from "sonner";
 import {
   BarChart,
   Bar,
@@ -51,7 +52,8 @@ function LeaderboardPage() {
         const res = await facultyApi.topStudents();
         const list: any[] = res?.students || res?.data || res || [];
         setData(Array.isArray(list) ? list : []);
-      } catch {
+      } catch (e: any) {
+        toast.error("Couldn't load leaderboard", { description: e?.message });
         setData([]);
       } finally {
         setLoading(false);

@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2, Search, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { authStore } from "@/lib/auth";
 import { aiApi } from "@/lib/services";
 import { GlassCard } from "@/components/glass-card";
@@ -44,6 +45,7 @@ function SearchPage() {
       const list: any[] = res?.results || res?.matches || res?.data || res || [];
       setResults(Array.isArray(list) ? list : []);
     } catch (e: any) {
+      toast.error("Search failed", { description: e?.message });
       setResults([]);
     } finally {
       setBusy(false);

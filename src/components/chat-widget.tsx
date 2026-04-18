@@ -31,9 +31,9 @@ export function ChatWidget() {
     setInput("");
     setBusy(true);
     try {
-      const res = await aiApi.chat(text, messages);
+      const res = await aiApi.chat(text);
       const reply: string =
-        res?.reply || res?.message || res?.response || JSON.stringify(res);
+        res?.reply || res?.message || res?.response || "(no reply)";
       setMessages((m) => [...m, { role: "assistant", content: reply }]);
     } catch (e: any) {
       setMessages((m) => [
