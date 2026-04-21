@@ -15,8 +15,10 @@ export const Route = createFileRoute("/login")({
     meta: [
       { title: "Sign in — Trackademic" },
       { name: "description", content: "Sign in to your Trackademic account." },
+      
     ],
   }),
+  
   component: LoginPage,
 });
 
