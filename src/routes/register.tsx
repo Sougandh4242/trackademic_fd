@@ -181,7 +181,7 @@ function RegisterPage() {
                 />
               </Field>
             </div>
-            // ADD this block after the grid div closing tag
+            {/* ADD this block after the grid div closing tag */}
             {role === "faculty" && (
               <Field label="Faculty Access Code" error={errors.faculty_code?.message}>
                 <input
