@@ -50,8 +50,9 @@ function LeaderboardPage() {
       setLoading(true);
       try {
         const res = await facultyApi.topStudents();
-        const list: any[] = res?.students || res?.data || res || [];
-        setData(Array.isArray(list) ? list : []);
+        const raw = res?.students || res?.data || res || {};
+        const list = Array.isArray(raw) ? raw : Object.values(raw).flat();
+        setData(list as any[]);
       } catch (e: any) {
         toast.error("Couldn't load leaderboard", { description: e?.message });
         setData([]);
