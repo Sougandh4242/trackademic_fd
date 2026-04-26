@@ -32,6 +32,7 @@ const schema = z.object({
   role: z.enum(["student", "faculty"]),
   usn: z.string().trim().max(40).optional().or(z.literal("")),
   department: z.string().trim().max(80).optional().or(z.literal("")),
+  faculty_code: z.string().optional().or(z.literal("")),
 });
 type FormVals = z.infer<typeof schema>;
 
@@ -61,6 +62,7 @@ function RegisterPage() {
         ...values,
         usn: values.usn || undefined,
         department: values.department || undefined,
+        faculty_code: values.faculty_code || undefined,
       });
       refresh();
       toast.success("Account created", {
@@ -120,7 +122,7 @@ function RegisterPage() {
           <div className="mt-5 space-y-4">
             <Field label="Full name" error={errors.name?.message}>
               <input
-                placeholder="Ada Lovelace"
+                placeholder="Name as per college records"
                 className={inputCls}
                 {...register("name")}
               />
@@ -157,7 +159,7 @@ function RegisterPage() {
               {role === "student" ? (
                 <Field label="USN" error={errors.usn?.message}>
                   <input
-                    placeholder="1AB23CS456"
+                    placeholder="1DS23CS456"
                     className={inputCls}
                     {...register("usn")}
                   />
@@ -173,12 +175,23 @@ function RegisterPage() {
               )}
               <Field label="Department" error={errors.department?.message}>
                 <input
-                  placeholder="CSE"
+                  placeholder="AIML"
                   className={inputCls}
                   {...register("department")}
                 />
               </Field>
             </div>
+            // ADD this block after the grid div closing tag
+            {role === "faculty" && (
+              <Field label="Faculty Access Code" error={errors.faculty_code?.message}>
+                <input
+                  type="password"
+                  placeholder="Enter code provided by admin"
+                  className={inputCls}
+                  {...register("faculty_code")}
+                />
+              </Field>
+            )}
           </div>
 
           <Button

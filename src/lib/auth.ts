@@ -113,6 +113,7 @@ export async function register(payload: {
   role: Role;
   usn?: string;
   department?: string;
+  faculty_code?: string;  // ← add this line
 }): Promise<AuthResponse> {
   try {
     const { data } = await api.post("/register", payload);
