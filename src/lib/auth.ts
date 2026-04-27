@@ -57,7 +57,7 @@ export const authStore = {
 
 /**
  * POST /login -> { token, role }
- * After login we fetch /get-profile to populate the user object.
+ * After login we fetch /get-full-profile to populate the user object.
  */
 export async function login(payload: {
   email: string;
@@ -81,7 +81,7 @@ export async function login(payload: {
       ...(data?.user || {}),
     };
     try {
-      const { data: prof } = await api.get("/get-profile");
+      const { data: prof } = await api.get("/get-full-profile");
       const p = prof?.profile || prof || {};
       user = {
         email: p.email || payload.email,
@@ -113,7 +113,7 @@ export async function register(payload: {
   role: Role;
   usn?: string;
   department?: string;
-  faculty_code?: string;  // ← add this line
+  faculty_code?: string;
 }): Promise<AuthResponse> {
   try {
     const { data } = await api.post("/register", payload);
@@ -126,7 +126,25 @@ export async function register(payload: {
       usn: payload.usn,
       department: payload.department,
     };
-    if (token) authStore.set(token, user);
+
+    if (token) {
+      authStore.set(token, user);
+
+      // Auto-create profile after registration
+      if (payload.role === "student") {
+        try {
+          await api.post("/create-profile", {
+            department: payload.department || "",
+            semester: 1,
+            headline: "",
+            bio: "",
+          });
+        } catch {
+          // ignore if profile already exists
+        }
+      }
+    }
+
     return { token, user };
   } catch (e) {
     throw toApiError(e);
